@@ -1,0 +1,2 @@
+# DotNetCoreTemplate
+DotNetCoreTemplate
