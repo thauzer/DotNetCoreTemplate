@@ -2,8 +2,8 @@ using System.Threading.Tasks;
 
 namespace DotNetCoreTemplate.Infrastructure.Services.Contracts
 {
-    public interface ISearchService
+    public interface ITemplateService
     {
-        Task<string> SearchByOrderReferenceAsync(string orderReference);
+        Task<string> TemplateServiceCallAsync(string inputString);
     }
 }

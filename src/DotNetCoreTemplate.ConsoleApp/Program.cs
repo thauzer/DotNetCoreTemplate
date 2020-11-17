@@ -17,7 +17,7 @@ namespace DotNetCoreTemplate.ConsoleApp
     [HelpOption]
     [VersionOptionFromMember(MemberName = "GetVersion")]
     [Subcommand(
-        typeof(DotNetCoreTemplate.ConsoleApp.ConsoleCommands.OrderCommand)
+        typeof(DotNetCoreTemplate.ConsoleApp.ConsoleCommands.TemplateCommand)
     )]
     class Program
     {
@@ -26,16 +26,21 @@ namespace DotNetCoreTemplate.ConsoleApp
 
             var host = CreateHost();
 
-            await host.RunCommandLineApplicationAsync<Program>(args);
+            try
+            {
+                await host.RunCommandLineApplicationAsync<Program>(args);
+            } catch (CommandParsingException ex)
+            {
+                Console.Error.WriteLine(ex.Message);
+
+                return;
+            }
         }
 
         public static IHostBuilder CreateHost()
         {
             var host = new HostBuilder();
-            host.ConfigureLogging(factory =>
-            {
-                factory.AddSerilog();   
-            })
+            host
             .ConfigureAppConfiguration((hostContext, configApp) =>
             {
                 configApp.SetBasePath(Directory.GetCurrentDirectory());
@@ -48,10 +53,15 @@ namespace DotNetCoreTemplate.ConsoleApp
             })
             .ConfigureServices((hostContext, services) =>
             {
-                services.AddScoped<ISearchService, SearchService>();
-                services.AddScoped<TestService>();
+                services.AddScoped<ITemplateService, TemplateService>();
             })
-            .UseSerilog()
+            .ConfigureLogging((hostContext, factory) =>
+            {
+                Log.Logger = 
+                new LoggerConfiguration()
+                .ReadFrom.Configuration(hostContext.Configuration).CreateLogger();
+                factory.AddSerilog();  
+            })
             .UseConsoleLifetime();
 
 
